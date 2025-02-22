@@ -410,7 +410,7 @@ def project_management():
         # Display and manage pull requests
         st.subheader("Active Pull Requests")
         for pid, proj in projects.items():
-            if proj["owner"] == st.session_state.get("user", {}).get("username"):
+            if proj.get("owner") == st.session_state.get("user", {}).get("username"):
                 for fork_id, fork in proj["forks"].items():
                     if fork.get("pull_request"):
                         st.write(f"PR from {fork['user']}:")
