@@ -438,7 +438,8 @@ if menu == "Home":
     st.title("Welcome to Collaborative Coding Platform 🚀")
     st.write('''Your ultimate space for seamless teamwork and innovation!
 
-Key Features:
+Key Features:(!!Important announcement:The project section is under development.Will be out soon..)
+
 - 🛠 Real-Time Collaborative Coding
 - 💬 Integrated Chat System
 - 🎨 Syntax Highlighting
@@ -446,7 +447,7 @@ Key Features:
 - 👤 Personalized Profiles
 - 🔒 Secure Authentication
 - 📚 Flashcards for Learning
-(!!Important announcement:The project section is under development.Will be out soon..)
+
 Get Started:
 Login or register to start collaborating!''')
 
