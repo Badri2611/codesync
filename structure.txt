@@ -1,0 +1,11 @@
+collaborative_coding/
+│
+├── app.py                  # Main application file
+├── data/                   # Directory for storing JSON data files
+│   ├── users.json          # Stores user details
+|   |---snippets.json       #stores code snippets
+|   |---leaderboard.json    #stores the leaderboard points data
+|   |---flashcards.json     #stores the flashcards documentation
+│   └── rooms.json          # Stores room-specific data (code and chat)
+├── requirements.txt        # Python dependencies
+└── README.md               # Project documentation
