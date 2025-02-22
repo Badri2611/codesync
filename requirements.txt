@@ -1,2 +1,9 @@
 streamlit
+flask
+flask-socketio
+gevent
+gevent-websocket
+eventlet
 email-validator
+python-dateutil
+uuid
