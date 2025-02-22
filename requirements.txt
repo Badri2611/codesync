@@ -1,9 +1,2 @@
 streamlit
 email-validator
-difflib
-smtplib
-uuid
-random
-datetime
-subprocess
-streamlit
