@@ -1,0 +1,12 @@
+{
+    "python": [
+        {"title": "Variable Declaration", "content": "Variables are declared using the `=` operator."},
+        {"title": "Loops", "content": "Python supports `for` and `while` loops for iteration."}
+    ],
+    "c": [
+        {"title": "Hello World", "content": "#include <stdio.h>\nint main() { printf(\"Hello World\"); return 0; }"}
+    ],
+    "html": [
+        {"title": "HTML Structure", "content": "<!DOCTYPE html>\n<html>\n<body>\n</body>\n</html>"}
+    ]
+}
