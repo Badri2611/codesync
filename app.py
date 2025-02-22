@@ -446,7 +446,7 @@ Key Features:
 - 👤 Personalized Profiles
 - 🔒 Secure Authentication
 - 📚 Flashcards for Learning
-
+(!!Important announcement:The project section is under development.Will be out soon..)
 Get Started:
 Login or register to start collaborating!''')
 
