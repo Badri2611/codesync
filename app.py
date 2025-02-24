@@ -18,7 +18,7 @@ LEADERBOARD_FILE = './data/leaderboard.json'
 PROJECTS_FILE = "data/projects.json"
 
 # Streamlit Configuration
-st.set_page_config(page_title="Collaborative Coding Platform", layout="wide")
+st.set_page_config(page_title="Codesync", layout="wide")
 
 # Utility Functions
 def load_json(file_path, default_data=None):
@@ -226,7 +226,7 @@ def workspace():
     # Enhanced Chat Section
     st.subheader("Chat Box")
     chat_input = st.text_input("Type a message")
-    emoji_picker = st.selectbox("React with Emoji", ["😊", "👍", "🚀", "🔥", "❓", "👎", "🤔", "😀", "💩", "😎", "🫥", "👽", "☠️", "🤡", "🤯", "🤬"], index=0)
+    emoji_picker = st.selectbox("React with Emoji", [".", "👍", "🚀", "🔥", "❓", "👎", "🤔", "😀", "💩", "😎", "🫥", "👽", "☠️", "🤡", "🤯", "🤬"], index=0)
 
     if st.button("Send Message"):
         message = {
@@ -351,73 +351,78 @@ def project_management():
         selected_project = st.selectbox("Select a project", list(project_list.values()))
 
         # Fork Project
-        if st.session_state.user.get("is_logged_in"):
-            if st.button("Fork Project"):
-                user = st.session_state.user["username"]
-                for pid, proj in projects.items():
-                    if proj["name"] == selected_project:
-                        fork_id = str(uuid.uuid4())
-                        projects[pid]["forks"][fork_id] = {
-                            "user": user,
-                            "code": proj["main_branch"],
-                            "pull_request": False,
-                            "changes": []
-                        }
-                        save_projects(projects)
-                        st.success(f"Project '{selected_project}' forked successfully!")
+        if st.session_state.user.get("is_logged_in") and st.button("Fork Project"):
+            user = st.session_state.user["username"]
+            for pid, proj in projects.items():
+                if proj["name"] == selected_project:
+                    fork_id = str(uuid.uuid4())
+                    proj["forks"][fork_id] = {
+                        "user": user,
+                        "code": proj["main_branch"],
+                        "pull_request": False,
+                        "changes": []
+                    }
+                    save_projects(projects)
+                    st.success(f"Project '{selected_project}' forked successfully!")
 
         # Display forks and edits
         st.subheader("Your Forks")
         user_forks = [
-            (pid, fork_id, fork) 
+            (pid, fork_id, fork_data)
             for pid, proj in projects.items()
-            for fork_id, fork in proj["forks"].items()
-            if fork["user"] == st.session_state.get("user", {}).get("username")
+            for fork_id, fork_data in proj["forks"].items()
+            if fork_data["user"] == st.session_state.get("user", {}).get("username")
         ]
 
         if user_forks:
-            selected_fork = st.selectbox(
-                "Select your fork",
-                [f"{proj['name']} - {fork_id[:8]}" for pid, fork_id, proj in user_forks]
-            )
-            fork_id_full = user_forks[[f[1] for f in user_forks].index(selected_fork.split(" - ")[1])]
-            selected_fork_data = user_forks[fork_id_full][2]
+            fork_options = [
+                f"{projects[pid]['name']} - {fork_id[:8]}"
+                for (pid, fork_id, _) in user_forks
+            ]
+            selected_fork = st.selectbox("Select your fork", fork_options)
 
-            # Code Editor
-            new_code = st.text_area(
-                "Edit your fork",
-                value=selected_fork_data["code"],
-                height=300,
-                key=f"editor_{selected_fork}"
-            )
+            # Find selected fork data
+            selected_pid, selected_fork_id = None, None
+            for pid, fork_id, fork_data in user_forks:
+                if f"{projects[pid]['name']} - {fork_id[:8]}" == selected_fork:
+                    selected_pid = pid
+                    selected_fork_id = fork_id
+                    selected_fork_data = fork_data
+                    break
 
-            if st.button("Save Changes"):
-                # Track changes
-                old_code = selected_fork_data["code"]
-                changes = track_changes(old_code, new_code)
-                
-                # Update fork
-                projects[user_forks[fork_id_full][0]]["forks"][user_forks[fork_id_full][1]]["code"] = new_code
-                projects[user_forks[fork_id_full][0]]["forks"][user_forks[fork_id_full][1]]["changes"] = changes
-                save_projects(projects)
-                st.success("Changes saved successfully!")
+            if selected_pid:
+                # Code Editor
+                new_code = st.text_area(
+                    "Edit your fork",
+                    value=selected_fork_data["code"],
+                    height=300,
+                    key=f"editor_{selected_fork_id}"
+                )
 
-            if st.button("Submit Pull Request"):
-                projects[user_forks[fork_id_full][0]]["forks"][user_forks[fork_id_full][1]]["pull_request"] = True
-                save_projects(projects)
-                st.success("Pull request submitted!")
+                if st.button("Save Changes"):
+                    old_code = selected_fork_data["code"]
+                    changes = track_changes(old_code, new_code)
+                    projects[selected_pid]["forks"][selected_fork_id]["code"] = new_code
+                    projects[selected_pid]["forks"][selected_fork_id]["changes"] = changes
+                    save_projects(projects)
+                    st.success("Changes saved successfully!")
 
-        # Display and manage pull requests
+                if st.button("Submit Pull Request"):
+                    projects[selected_pid]["forks"][selected_fork_id]["pull_request"] = True
+                    save_projects(projects)
+                    st.success("Pull request submitted!")
+
+        # Display pull requests
         st.subheader("Active Pull Requests")
         for pid, proj in projects.items():
             if proj.get("owner") == st.session_state.get("user", {}).get("username"):
-                for fork_id, fork in proj["forks"].items():
-                    if fork.get("pull_request"):
-                        st.write(f"PR from {fork['user']}:")
-                        st.code(fork["code"], language='python')
+                for fork_id, fork_data in proj["forks"].items():
+                    if fork_data.get("pull_request"):
+                        st.write(f"PR from {fork_data['user']}:")
+                        st.code(fork_data["code"], language='python')
                         
-                        if st.button(f"Merge {fork['user']}'s PR", key=f"merge_{fork_id}"):
-                            proj["main_branch"] = fork["code"]
+                        if st.button(f"Merge {fork_data['user']}'s PR", key=f"merge_{fork_id}"):
+                            proj["main_branch"] = fork_data["code"]
                             del proj["forks"][fork_id]
                             save_projects(projects)
                             st.success("Changes merged successfully!")
@@ -435,21 +440,20 @@ if st.session_state.user.get("is_logged_in"):
     logout_user()
 
 if menu == "Home":
-    st.title("Welcome to Collaborative Coding Platform 🚀")
+    st.title("Codesync 🚀")
+    st.write(" 🚀Welcome to Collaborative Coding platform🚀")
     st.write('''Your ultimate space for seamless teamwork and innovation!
 
-Key Features:(!!Important announcement:The project section is under development.Will be out soon..)
-
+Key Features:
 - 🛠 Real-Time Collaborative Coding
 - 💬 Integrated Chat System
 - 🎨 Syntax Highlighting
 - 🖥 Code Execution
 - 👤 Personalized Profiles
 - 🔒 Secure Authentication
-- 📚 Flashcards for Learning
-
-Get Started:
-Login or register to start collaborating!''')
+- 🏆 Gamified Achievements
+- Notice: Project section is under development and will be out soon in our version 2.0!
+    ''')
 
 elif menu == "Login":
     if not st.session_state.user.get("is_logged_in"):
