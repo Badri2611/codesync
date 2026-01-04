@@ -1,3 +1,7 @@
+# codesync
+#This project is under development so some features might not work properly if any issue presist contact the developers or the official mail(codesync2611@gmail.com)
+
+
 🚀 Codesync
 Codesync is a collaborative platform designed for developers to code, communicate, and innovate together in real-time. Built with Streamlit, it combines a shared code editor with social and gamification features to make teamwork seamless and fun.
 
@@ -27,5 +31,3 @@ This platform is designed for collaborative learning and development. Always ens
 
 Developed by Badri2611
 
-# codesync
-#This project is under development so some features might not work properly if any issue presist contact the developers or the official mail(codesync2611@gmail.com)
